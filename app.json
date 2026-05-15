@@ -8,7 +8,8 @@
     "scheme": "carbontracker",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon/icon.json",
+      "bundleIdentifier": "com.raharinda.carbontracker"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +18,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.raharinda.CarbonTracker"
     },
     "web": {
       "output": "static",
@@ -35,11 +37,18 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c70b3c83-5d87-4b76-836c-c8e1c694ac0f"
+      }
     }
   }
 }

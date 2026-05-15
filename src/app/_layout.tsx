@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import "../../global.css";
 
 SplashScreen.preventAutoHideAsync();
-initAuthListener(); // ← tambah ini, di luar komponen
+initAuthListener(); // ← tambah balik di sini, di luar komponen
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

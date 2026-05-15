@@ -6,6 +6,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        primary: "#25CE7F",
+        background: "#0E0E0E",
+        surface: "#171717",
+        border: "#2a2a2a",
+        muted: "#888888",
         // ── Light ──────────────────────────────────────────────────────────
         background: {
           DEFAULT: "#FFFFFF",
