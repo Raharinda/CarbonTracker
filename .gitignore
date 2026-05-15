@@ -43,3 +43,11 @@ app-example
 /ios
 /android
 
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# Env
+.env
+.env.local
+.env.*.local
