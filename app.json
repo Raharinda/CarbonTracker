@@ -6,10 +6,11 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "carbontracker",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "ios": {
-      "icon": "./assets/expo.icon/icon.json",
-      "bundleIdentifier": "com.raharinda.carbontracker"
+      "bundleIdentifier": "com.raharinda.carbontracker",
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
@@ -31,15 +32,14 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#FFFFFF",
           "android": {
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
           }
         }
       ],
-      "expo-web-browser",
-      "@react-native-firebase/app"
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
