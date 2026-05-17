@@ -45,14 +45,14 @@ export default function WelcomeScreen() {
             variant="primary"
             size="lg"
             fullWidth
-            onPress={() => router.push("/(onboarding)/(auth)/register")}
+            onPress={() => router.push("/(auth)/register")}
           />
           <AppButton
             label="I already have an account"
             variant="primary-subtle"
             size="lg"
             fullWidth
-            onPress={() => router.push("/(onboarding)/(auth)/login")}
+            onPress={() => router.push("/(auth)/login")}
           />
         </View>
       </SafeAreaView>

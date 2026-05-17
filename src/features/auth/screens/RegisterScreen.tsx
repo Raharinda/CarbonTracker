@@ -1,15 +1,23 @@
+// REGISTER SCREEN
+
 import { router } from "expo-router";
+
 import { ArrowLeft, Lock, Mail, User } from "lucide-react-native";
+
 import React from "react";
+
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+
 import { FormField } from "../components/FormFields";
 import { useRegisterForm } from "../hooks/useAuthForm";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
@@ -21,110 +29,125 @@ export function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-white"
+      className="flex-1 bg-[#F6F6F6]"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+        contentContainerStyle={{
+          paddingHorizontal: 22,
+          paddingBottom: 40,
+        }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        {/* Header */}
         <TouchableOpacity
           onPress={() => router.back()}
-          className="flex-row items-center gap-2 mt-14 mb-8"
+          className="flex-row items-center gap-2 mt-14 mb-10"
         >
           <ArrowLeft size={18} color="#25CE7F" />
-          <Text className="text-brand font-bold text-base">CarbonTracker</Text>
+
+          <Text className="text-brand font-extrabold text-[22px]">Wattly</Text>
         </TouchableOpacity>
 
-        <Text className="text-zinc-900 text-3xl font-extrabold text-center mb-2 leading-tight">
-          Join{"\n"}
-          <Text className="text-brand">Carbon</Text>Tracker
-        </Text>
-        <Text className="text-zinc-400 text-sm text-center mb-6 leading-relaxed">
-          Step into the future of sustainable{"\n"}living with a personal touch.
-        </Text>
-
-        {/* Social Buttons */}
-        <View className="flex-row gap-3 mb-5">
-          <TouchableOpacity className="flex-1 h-12 bg-zinc-50 border border-zinc-200 rounded-xl items-center justify-center flex-row gap-2">
-            <Text className="text-zinc-800 text-lg">&#xF8FF;</Text>
-            <Text className="text-zinc-500 text-xs font-semibold">Apple</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => promptAsync()}
-            className="flex-1 h-12 bg-zinc-50 border border-zinc-200 rounded-xl items-center justify-center flex-row gap-2"
-          >
-            <Text className="text-brand font-extrabold text-sm">G</Text>
-            <Text className="text-zinc-500 text-xs font-semibold">Google</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Divider */}
-        <View className="flex-row items-center gap-3 mb-5">
-          <View className="flex-1 h-px bg-zinc-200" />
-          <Text className="text-zinc-400 text-xs font-medium">
-            or with email
+        {/* Hero */}
+        <View className="items-center mb-10">
+          <Text className="text-brand text-[44px] font-extrabold leading-none">
+            Join X
           </Text>
-          <View className="flex-1 h-px bg-zinc-200" />
+
+          <Text className="text-zinc-500 text-center text-[15px] leading-5 mt-4 px-5">
+            Step into the future of sustainable living{"\n"}
+            with a personal touch.
+          </Text>
         </View>
 
-        <FormField
-          control={form.control}
-          name="fullName"
-          label="Full Name"
-          icon={User}
-          placeholder="John Doe"
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          label="Email Address"
-          icon={Mail}
-          placeholder="your@email.com"
-          inputProps={{ keyboardType: "email-address" }}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          label="Password"
-          icon={Lock}
-          placeholder="Minimum 6 characters"
-          secureTextEntry
-        />
+        {/* Card */}
+        <View className="bg-white rounded-[30px] px-5 py-6 border border-zinc-100 shadow-sm">
+          {/* Social Buttons */}
+          <View className="flex-row gap-3 mb-6">
+            {/* Apple */}
+            <TouchableOpacity className="flex-1 h-11 rounded-full border border-brand items-center justify-center flex-row gap-2">
+              <FontAwesome5 name="apple" size={18} color="#25CE7F" />
+
+              <Text className="text-brand text-sm font-semibold">
+                Continue with
+              </Text>
+            </TouchableOpacity>
+
+            {/* Google */}
+            <TouchableOpacity
+              onPress={() => promptAsync()}
+              className="flex-1 h-11 rounded-full border border-brand items-center justify-center flex-row gap-2"
+            >
+              <AntDesign name="google" size={18} color="#25CE7F" />
+
+              <Text className="text-brand text-sm font-semibold">
+                Continue with
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <FormField
+            control={form.control}
+            name="fullName"
+            label="Full Name"
+            icon={User}
+            placeholder="John Doe"
+          />
+
+          <FormField
+            control={form.control}
+            name="email"
+            label="Email Address"
+            icon={Mail}
+            placeholder="your@email.com"
+            inputProps={{ keyboardType: "email-address" }}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            label="Password"
+            icon={Lock}
+            placeholder="Minimum 6 characters"
+            secureTextEntry
+          />
+        </View>
 
         {error && (
-          <Text className="text-red-500 text-sm text-center mb-3">{error}</Text>
+          <Text className="text-red-500 text-sm text-center mt-4">{error}</Text>
         )}
 
         <TouchableOpacity
           onPress={onSubmit}
           disabled={isLoading}
-          className="bg-brand h-14 rounded-2xl items-center justify-center mt-2 mb-4"
+          className="bg-brand h-14 rounded-full items-center justify-center mt-10"
         >
           {isLoading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text className="text-white font-extrabold text-base tracking-wide">
+            <Text className="text-white font-extrabold text-lg">
               Create An Account
             </Text>
           )}
         </TouchableOpacity>
 
-        <Text className="text-zinc-400 text-sm text-center">
+        <Text className="text-zinc-500 text-base text-center mt-6">
           Already have an account?{" "}
           <Text
             className="text-brand font-bold"
-            onPress={() => router.push("/(onboarding)/(auth)/login")}
+            onPress={() => router.push("/(auth)/login")}
           >
             Log In
           </Text>
         </Text>
-        <Text className="text-zinc-300 text-xs text-center mt-3 leading-relaxed">
+
+        <Text className="text-zinc-400 text-xs text-center mt-4 leading-5 px-5">
           By signing up, you agree to our{" "}
-          <Text className="text-brand">Terms</Text> &{" "}
-          <Text className="text-brand">Privacy Policy</Text>
+          <Text className="text-brand font-semibold">Terms</Text> &{" "}
+          <Text className="text-brand font-semibold">Privacy Policy</Text>
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>

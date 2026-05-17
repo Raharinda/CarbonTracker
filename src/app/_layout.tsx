@@ -1,6 +1,6 @@
 import { initAuthListener } from "@/features/auth/store/authStore";
 import { LoadingProvider } from "@/providers/LoadingProvider";
-import { ThemeProvider } from "@/theme/ThemeProvider";
+import { ThemeProvider } from "@/shared/theme/ThemeProvider";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";

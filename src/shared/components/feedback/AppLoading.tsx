@@ -16,31 +16,29 @@
 //   <AppLoading size="lg" color="brand" />
 // =============================================================================
 
-import { useTheme } from '@/theme/ThemeProvider';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Text, View } from 'react-native';
+import { useTheme } from "@/shared/theme/ThemeProvider";
+import React, { useEffect, useRef } from "react";
+import { Animated, Easing, Text, View } from "react-native";
 
 // =============================================================================
 // TIPE PROPS
 // =============================================================================
 
 type AppLoadingProps = {
-
   // Ukuran spinner — default: 'md'
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 
   // Warna spinner — default: 'brand'
   //   brand   → hijau (warna utama)
   //   primary → teks utama (hitam/putih)
   //   muted   → abu-abu
-  color?: 'brand' | 'primary' | 'muted';
+  color?: "brand" | "primary" | "muted";
 
   // Teks di bawah spinner (opsional)
   label?: string;
 
   // true → spinner menutupi seluruh layar dengan overlay
   fullScreen?: boolean;
-
 };
 
 // =============================================================================
@@ -60,9 +58,9 @@ const borderWidth = {
 };
 
 const labelSize = {
-  sm: 'text-xs',
-  md: 'text-sm',
-  lg: 'text-base',
+  sm: "text-xs",
+  md: "text-sm",
+  lg: "text-base",
 };
 
 // =============================================================================
@@ -70,9 +68,9 @@ const labelSize = {
 // =============================================================================
 
 function Spinner({
-  size = 'md',
-  color = 'brand',
-}: Pick<AppLoadingProps, 'size' | 'color'>) {
+  size = "md",
+  color = "brand",
+}: Pick<AppLoadingProps, "size" | "color">) {
   const { theme } = useTheme();
 
   // Nilai animasi rotasi
@@ -86,25 +84,25 @@ function Spinner({
         duration: 800,
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     ).start();
   }, []);
 
   // Konversi nilai 0-1 menjadi derajat rotasi 0-360
   const rotate = rotation.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ["0deg", "360deg"],
   });
 
   // Pilih warna berdasarkan prop color
   const spinnerColor = {
-    brand:   theme.brandDefault,
+    brand: theme.brandDefault,
     primary: theme.textPrimary,
-    muted:   theme.textTertiary,
+    muted: theme.textTertiary,
   }[color];
 
-  const diameter = spinnerSize[size ?? 'md'];
-  const border   = borderWidth[size ?? 'md'];
+  const diameter = spinnerSize[size ?? "md"];
+  const border = borderWidth[size ?? "md"];
 
   return (
     <Animated.View
@@ -114,7 +112,7 @@ function Spinner({
         borderRadius: diameter / 2,
         borderWidth: border,
         // Warna track (lingkaran penuh yang redup)
-        borderColor: spinnerColor + '30',
+        borderColor: spinnerColor + "30",
         // Warna arc (bagian yang berputar)
         borderTopColor: spinnerColor,
         transform: [{ rotate }],
@@ -128,17 +126,17 @@ function Spinner({
 // =============================================================================
 
 export default function AppLoading({
-  size = 'md',
-  color = 'brand',
+  size = "md",
+  color = "brand",
   label,
   fullScreen = false,
 }: AppLoadingProps) {
   const { theme } = useTheme();
 
   const labelColor = {
-    brand:   theme.brandDefault,
+    brand: theme.brandDefault,
     primary: theme.textPrimary,
-    muted:   theme.textTertiary,
+    muted: theme.textTertiary,
   }[color];
 
   // ---------------------------------------------------------------------------
@@ -150,7 +148,7 @@ export default function AppLoading({
         className="absolute inset-0 items-center justify-center"
         style={{
           // Overlay semi-transparan
-          backgroundColor: theme.bgPrimary + 'CC',
+          backgroundColor: theme.bgPrimary + "CC",
           zIndex: 999,
         }}
       >

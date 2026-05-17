@@ -1,7 +1,7 @@
 // =============================================================================
 // AppButton.tsx
 // =============================================================================
-import { useTheme } from "@/theme/ThemeProvider";
+import { useTheme } from "@/shared/theme/ThemeProvider";
 import React from "react";
 import { ActivityIndicator, Pressable, Text } from "react-native";
 

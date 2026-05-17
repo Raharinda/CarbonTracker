@@ -18,7 +18,6 @@ const loginSchema = z.object({
   password: z.string().min(6, "Minimum 6 characters"),
 });
 
-// Firebase error code → pesan yang readable
 function parseFirebaseError(err: any): string {
   const code = err?.code as string;
   const map: Record<string, string> = {
@@ -47,11 +46,9 @@ export const useRegisterForm = () => {
       setError(null);
       setLoading(true);
       await authService.register(data.email, data.password, data.fullName);
-      router.replace("/(app)/dashboard");
+      setLoading(false);
+      router.replace("/(onboarding)/intro");
     } catch (err: any) {
-      console.log("REGISTER ERROR:", JSON.stringify(err)); // ← tambah ini
-      console.log("ERROR CODE:", err?.code);
-      console.log("ERROR MESSAGE:", err?.message);
       setError(parseFirebaseError(err));
       setLoading(false);
     }
@@ -73,14 +70,10 @@ export const useLoginForm = () => {
       setError(null);
       setLoading(true);
       await authService.login(data.email, data.password);
+      setLoading(false);
       router.replace("/(app)/dashboard");
     } catch (err: any) {
-      console.log("REGISTER ERROR:", JSON.stringify(err)); // ← tambah ini
-      console.log("ERROR CODE:", err?.code);
-      console.log("ERROR MESSAGE:", err?.message);
       setError(parseFirebaseError(err));
-      const msg = `CODE: ${err?.code} | MSG: ${err?.message}`;
-      setError(msg);
       setLoading(false);
     }
   });
