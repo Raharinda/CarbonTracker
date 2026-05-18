@@ -1,14 +1,13 @@
 import { initAuthListener } from "@/features/auth/store/authStore";
 import { LoadingProvider } from "@/providers/LoadingProvider";
-import { ThemeProvider } from "@/shared/theme/ThemeProvider";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import Toast from "react-native-toast-message";
 import "../../global.css";
 
 SplashScreen.preventAutoHideAsync();
-initAuthListener(); // ← tambah balik di sini, di luar komponen
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -20,16 +19,20 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    const unsubscribe = initAuthListener(); // ← pindah ke sini
+    return () => unsubscribe?.(); // ← cleanup saat unmount
+  }, []);
+
+  useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
 
   return (
-    <ThemeProvider defaultScheme="system">
-      <LoadingProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </LoadingProvider>
-    </ThemeProvider>
+    <LoadingProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+      <Toast />
+    </LoadingProvider>
   );
 }

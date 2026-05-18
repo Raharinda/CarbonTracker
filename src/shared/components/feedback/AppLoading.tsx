@@ -1,82 +1,30 @@
-// =============================================================================
-// AppLoading.tsx
-// Komponen loading spinner yang bisa dipakai di seluruh app.
-//
-// Cara pakai:
-//   // Spinner kecil di dalam konten
-//   <AppLoading />
-//
-//   // Spinner fullscreen (nutup seluruh halaman)
-//   <AppLoading fullScreen />
-//
-//   // Dengan teks
-//   <AppLoading label="Memuat data..." />
-//
-//   // Ukuran dan warna custom
-//   <AppLoading size="lg" color="brand" />
-// =============================================================================
-
-import { useTheme } from "@/shared/theme/ThemeProvider";
+// shared/components/ui/AppLoading.tsx
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, Text, View } from "react-native";
 
-// =============================================================================
-// TIPE PROPS
-// =============================================================================
-
 type AppLoadingProps = {
-  // Ukuran spinner — default: 'md'
   size?: "sm" | "md" | "lg";
-
-  // Warna spinner — default: 'brand'
-  //   brand   → hijau (warna utama)
-  //   primary → teks utama (hitam/putih)
-  //   muted   → abu-abu
   color?: "brand" | "primary" | "muted";
-
-  // Teks di bawah spinner (opsional)
   label?: string;
-
-  // true → spinner menutupi seluruh layar dengan overlay
   fullScreen?: boolean;
 };
 
-// =============================================================================
-// UKURAN SPINNER
-// =============================================================================
+const spinnerSize = { sm: 20, md: 36, lg: 52 };
+const borderWidth = { sm: 2, md: 3, lg: 4 };
+const labelSize = { sm: "text-xs", md: "text-sm", lg: "text-base" };
 
-const spinnerSize = {
-  sm: 20,
-  md: 36,
-  lg: 52,
+const COLORS = {
+  brand: "#25CE7F",
+  primary: "#111111",
+  muted: "#888888",
 };
-
-const borderWidth = {
-  sm: 2,
-  md: 3,
-  lg: 4,
-};
-
-const labelSize = {
-  sm: "text-xs",
-  md: "text-sm",
-  lg: "text-base",
-};
-
-// =============================================================================
-// KOMPONEN SPINNER
-// =============================================================================
 
 function Spinner({
   size = "md",
   color = "brand",
 }: Pick<AppLoadingProps, "size" | "color">) {
-  const { theme } = useTheme();
-
-  // Nilai animasi rotasi
   const rotation = useRef(new Animated.Value(0)).current;
 
-  // Jalankan animasi rotasi terus-menerus saat komponen muncul
   useEffect(() => {
     Animated.loop(
       Animated.timing(rotation, {
@@ -88,19 +36,12 @@ function Spinner({
     ).start();
   }, []);
 
-  // Konversi nilai 0-1 menjadi derajat rotasi 0-360
   const rotate = rotation.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],
   });
 
-  // Pilih warna berdasarkan prop color
-  const spinnerColor = {
-    brand: theme.brandDefault,
-    primary: theme.textPrimary,
-    muted: theme.textTertiary,
-  }[color];
-
+  const spinnerColor = COLORS[color ?? "brand"];
   const diameter = spinnerSize[size ?? "md"];
   const border = borderWidth[size ?? "md"];
 
@@ -111,9 +52,7 @@ function Spinner({
         height: diameter,
         borderRadius: diameter / 2,
         borderWidth: border,
-        // Warna track (lingkaran penuh yang redup)
         borderColor: spinnerColor + "30",
-        // Warna arc (bagian yang berputar)
         borderTopColor: spinnerColor,
         transform: [{ rotate }],
       }}
@@ -121,45 +60,28 @@ function Spinner({
   );
 }
 
-// =============================================================================
-// KOMPONEN UTAMA
-// =============================================================================
-
 export default function AppLoading({
   size = "md",
   color = "brand",
   label,
   fullScreen = false,
 }: AppLoadingProps) {
-  const { theme } = useTheme();
+  const labelColor = COLORS[color ?? "brand"];
 
-  const labelColor = {
-    brand: theme.brandDefault,
-    primary: theme.textPrimary,
-    muted: theme.textTertiary,
-  }[color];
-
-  // ---------------------------------------------------------------------------
-  // Mode fullscreen — overlay di atas seluruh layar
-  // ---------------------------------------------------------------------------
   if (fullScreen) {
     return (
       <View
         className="absolute inset-0 items-center justify-center"
-        style={{
-          // Overlay semi-transparan
-          backgroundColor: theme.bgPrimary + "CC",
-          zIndex: 999,
-        }}
+        style={{ backgroundColor: "#0E0E0ECC", zIndex: 999 }}
       >
         <View
           className="items-center justify-center gap-4 rounded-3xl px-10 py-8"
-          style={{ backgroundColor: theme.surfaceRaised }}
+          style={{ backgroundColor: "#171717" }}
         >
           <Spinner size={size} color={color} />
           {label && (
             <Text
-              className={`${labelSize[size]} font-medium`}
+              className={`${labelSize[size ?? "md"]} font-medium`}
               style={{ color: labelColor }}
             >
               {label}
@@ -170,15 +92,12 @@ export default function AppLoading({
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Mode inline — spinner di dalam konten biasa
-  // ---------------------------------------------------------------------------
   return (
     <View className="items-center justify-center gap-3">
       <Spinner size={size} color={color} />
       {label && (
         <Text
-          className={`${labelSize[size]} font-medium`}
+          className={`${labelSize[size ?? "md"]} font-medium`}
           style={{ color: labelColor }}
         >
           {label}

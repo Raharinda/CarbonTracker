@@ -1,4 +1,4 @@
-import AppButton from "@/shared/components/ui/AppButton";
+import { AppButton } from "@/shared/components/ui/AppButton";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Text, View } from "react-native";

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Text, View } from "react-native";
+
 import { OnboardingSlideData } from "../types";
 
 interface Props {
@@ -9,62 +10,66 @@ interface Props {
 
 export const OnboardingMockup = ({ slide }: Props) => {
   return (
-    <View className="relative w-[320px] h-[290px] items-center justify-center">
-      {/* Top floating label */}
+    <View className="relative w-[352px] h-[306px]">
+      {/* Top Floating Label */}
       <View
         className="
           absolute
-          top-4
+          top-0
           left-2
-          z-10
-          bg-[#F7F7F7]
-          px-6
-          py-4
-          rounded-[24px]
-          shadow-sm
+          z-20
+          bg-white
+          px-7
+          py-5
+          rounded-[28px]
         "
         style={{
           shadowColor: "#000",
           shadowOpacity: 0.12,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 6,
+          shadowRadius: 12,
+          shadowOffset: {
+            width: 0,
+            height: 6,
+          },
+          elevation: 8,
         }}
       >
         <Text
           className="
-            text-primary
-            text-[18px]
+            text-brand
+            text-[20px]
             leading-[24px]
-            font-extrabold
             text-center
+            font-extrabold
           "
         >
           {slide.labelText}
         </Text>
       </View>
 
-      {/* Hero image outer frame */}
+      {/* Main Image Card */}
       <View
         className="
           absolute
-          top-14
+          top-16
           right-0
           w-[240px]
-          h-[185px]
+          h-[170px]
+          bg-white
           rounded-[38px]
-          bg-[#F7F7F7]
           p-[10px]
         "
         style={{
           shadowColor: "#000",
-          shadowOpacity: 0.08,
-          shadowRadius: 14,
-          shadowOffset: { width: 0, height: 6 },
-          elevation: 8,
+          shadowOpacity: 0.1,
+          shadowRadius: 16,
+          shadowOffset: {
+            width: 0,
+            height: 8,
+          },
+          elevation: 10,
         }}
       >
-        {/* Actual image */}
         <View className="flex-1 overflow-hidden rounded-[30px]">
           <Image
             source={require("@/assets/images/onboarding-hero.png")}
@@ -74,37 +79,40 @@ export const OnboardingMockup = ({ slide }: Props) => {
         </View>
       </View>
 
-      {/* Bottom card */}
+      {/* Bottom Device Card */}
       <View
         className="
           absolute
-          left-0
-          bottom-6
-          z-20
-          w-[165px]
-          rounded-[22px]
-          bg-[#EEF3EE]/95
+          left-6
+          bottom-3
+          z-30
+          w-[155px]
+          bg-[#EEF3EE]
+          rounded-[24px]
           px-4
-          py-3
+          py-4
         "
         style={{
           shadowColor: "#000",
-          shadowOpacity: 0.12,
-          shadowRadius: 12,
-          shadowOffset: { width: 0, height: 5 },
+          shadowOpacity: 0.16,
+          shadowRadius: 10,
+          shadowOffset: {
+            width: 0,
+            height: 5,
+          },
           elevation: 8,
         }}
       >
         {/* Top Row */}
         <View className="flex-row items-center justify-between">
-          {/* Icon */}
-          <View className="w-12 h-12 rounded-full bg-primary items-center justify-center">
+          {/* Bulb Icon */}
+          <View className="w-12 h-12 rounded-full bg-brand items-center justify-center">
             <Ionicons name="bulb-outline" size={22} color="white" />
           </View>
 
           {/* Toggle */}
-          <View className="w-[44px] h-[24px] rounded-full bg-primary/60 justify-center px-[3px] items-end">
-            <View className="w-[18px] h-[18px] rounded-full bg-white" />
+          <View className="w-[42px] h-[22px] rounded-full bg-brand justify-center px-[3px]">
+            <View className="w-[16px] h-[16px] rounded-full bg-white self-end" />
           </View>
         </View>
 
@@ -112,16 +120,22 @@ export const OnboardingMockup = ({ slide }: Props) => {
         <View className="mt-5 flex-row items-end justify-between">
           <Text
             className="
-              text-neutral-700
-              text-[16px]
-              leading-[20px]
+              text-[#4A4A4A]
+              text-[14px]
+              leading-[18px]
               font-medium
             "
           >
             Living{"\n"}Room
           </Text>
 
-          <Text className="text-primary text-[15px] font-bold">
+          <Text
+            className="
+              text-brand
+              text-[14px]
+              font-bold
+            "
+          >
             {slide.deviceKwh}
           </Text>
         </View>
