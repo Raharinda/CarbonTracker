@@ -1,8 +1,10 @@
 // src/app/(app)/_layout.tsx
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { router, Slot } from "expo-router";
+import AppLoading from "@/shared/components/feedback/AppLoading";
+import { AppTabBar } from "@/shared/components/ui/AppTabBar";
+import { Tabs, router } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 export default function AppLayout() {
   const { user, isLoading } = useAuthStore();
@@ -15,13 +17,23 @@ export default function AppLayout() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-white items-center justify-center">
-        <ActivityIndicator color="#25CE7F" size="large" />
+      <View className="flex-1 bg-background items-center justify-center">
+        <AppLoading size="lg" color="brand" />
       </View>
     );
   }
 
   if (!user) return null;
 
-  return <Slot />;
+  return (
+    <Tabs
+      tabBar={(props) => <AppTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
+      <Tabs.Screen name="dashboard" />
+      <Tabs.Screen name="energy" />
+      <Tabs.Screen name="devices" />
+      <Tabs.Screen name="profile" />
+    </Tabs>
+  );
 }
