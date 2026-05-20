@@ -1,19 +1,31 @@
+// features/onboarding/screens/DeviceListScreen.tsx
 import { router } from "expo-router";
 import { ArrowLeft, PlusCircle } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { useState } from "react";
+import {
+    Pressable,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { AddDeviceSheet } from "../../devices/components/AddDeviceSheet";
 import { DeviceCard } from "../../devices/components/DeviceCard";
 import { useDeviceStore } from "../../devices/store/deviceStore";
 
 export function DeviceListScreen() {
   const devices = useDeviceStore((s) => s.devices);
-
   const hasDevices = devices.length > 0;
+  const [sheetVisible, setSheetVisible] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-[#F4F4F4]">
-      <View className="flex-1 px-6">
+      <ScrollView
+        className="flex-1 px-6"
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View className="pt-3 mb-10">
           <Pressable
@@ -21,23 +33,18 @@ export function DeviceListScreen() {
             className="flex-row items-center gap-2 mb-8"
           >
             <ArrowLeft size={18} color="#25CE7F" />
-
             <Text className="text-[#25CE7F] text-lg font-bold">Wattly</Text>
           </Pressable>
 
-          {/* Badge */}
           <View className="self-center bg-[#25CE7F] rounded-full px-4 py-1 mb-8">
             <Text className="text-white text-[11px] font-bold tracking-wide">
               Device Onboarding
             </Text>
           </View>
 
-          {/* Title */}
           <Text className="text-[#111111] text-[48px] font-bold text-center leading-[50px] mb-4">
             Set Up{"\n"}Your Devices
           </Text>
-
-          {/* Subtitle */}
           <Text className="text-[#444] text-base text-center leading-6 px-6">
             Setup your smart monitor for optimal energy tracking.
           </Text>
@@ -56,29 +63,37 @@ export function DeviceListScreen() {
               <Text className="text-[#25CE7F] text-base font-semibold mb-2">
                 No device added yet
               </Text>
-
               <Text className="text-[#444] text-base text-center leading-7">
-                Tap the button below to add your{"\n"}
-                first device
+                Tap the button below to add your{"\n"}first device
               </Text>
             </View>
           )}
 
-          {/* Add Device Button */}
-          <Pressable
-            onPress={() => router.push("/(onboarding)/device-setup/add" as any)}
-            className="self-center mt-12 bg-[#25CE7F] rounded-full px-8 py-4 flex-row items-center gap-3 shadow-lg"
+          <View
+            style={{ alignItems: "center", marginTop: 48, marginBottom: 24 }}
           >
-            <PlusCircle size={18} color="white" />
-
-            <Text className="text-white text-base font-semibold">
-              {hasDevices ? "Add another device" : "Add your first device"}
-            </Text>
-          </Pressable>
+            <TouchableOpacity
+              onPress={() => setSheetVisible(true)}
+              style={{
+                backgroundColor: "#25CE7F",
+                borderRadius: 999,
+                paddingHorizontal: 32,
+                paddingVertical: 16,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              <PlusCircle size={18} color="white" />
+              <Text style={{ color: "white", fontSize: 16, fontWeight: "600" }}>
+                {hasDevices ? "Add another device" : "Add your first device"}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Footer */}
-        <View className="pb-8">
+        <View className="pb-8 mt-auto">
           <Pressable
             onPress={() =>
               router.replace("/(onboarding)/device-setup/complete" as any)
@@ -90,7 +105,12 @@ export function DeviceListScreen() {
             </Text>
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
+
+      <AddDeviceSheet
+        visible={sheetVisible}
+        onClose={() => setSheetVisible(false)}
+      />
     </SafeAreaView>
   );
 }

@@ -1,74 +1,65 @@
 // features/devices/components/CategoryGrid.tsx
-import { Pressable, Text, View } from "react-native";
-import type { DeviceCategory } from "../types/device.types";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Text, TouchableOpacity, View } from "react-native";
+import type { DeviceType } from "../types/device.types";
 
 interface CategoryOption {
-  value: DeviceCategory;
+  value: DeviceType;
   label: string;
-  subtitle: string;
-  emoji: string;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
 }
 
 const CATEGORIES: CategoryOption[] = [
-  {
-    value: "electronics",
-    label: "Electronics",
-    subtitle: "TV, PC, Console",
-    emoji: "🖥️",
-  },
-  {
-    value: "appliances",
-    label: "Appliances",
-    subtitle: "Fridge, AC, Wash",
-    emoji: "❄️",
-  },
-  {
-    value: "lighting",
-    label: "Lighting",
-    subtitle: "LED, Lamp, Strip",
-    emoji: "💡",
-  },
-  {
-    value: "other",
-    label: "Other",
-    subtitle: "Fan, Charger, etc",
-    emoji: "🔌",
-  },
+  { value: "ac", label: "AC Unit", icon: "snowflake" },
+  { value: "tv", label: "Smart TV", icon: "television-play" },
+  { value: "washer", label: "Washer", icon: "washing-machine" },
+  { value: "fridge", label: "Fridge", icon: "fridge-outline" },
+  { value: "lights", label: "Lights", icon: "lightbulb-outline" },
+  { value: "other", label: "Other", icon: "plus-circle-outline" },
 ];
 
 interface Props {
-  value: DeviceCategory;
-  onChange: (val: DeviceCategory) => void;
+  value: DeviceType;
+  onChange: (val: DeviceType) => void;
 }
 
 export function CategoryGrid({ value, onChange }: Props) {
   return (
-    <View className="flex-row flex-wrap gap-2">
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
       {CATEGORIES.map((cat) => {
         const isSelected = value === cat.value;
         return (
-          <Pressable
+          <TouchableOpacity
             key={cat.value}
             onPress={() => onChange(cat.value)}
-            className={`
-              flex-1 min-w-[45%] rounded-xl p-3 border
-              ${
-                isSelected
-                  ? "bg-[#25CE7F]/10 border-[#25CE7F]"
-                  : "bg-[#171717] border-[#2a2a2a]"
-              }
-            `}
+            style={{
+              width: "30%",
+              flexGrow: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingVertical: 14,
+              borderRadius: 16,
+              borderWidth: 1.5,
+              backgroundColor: isSelected ? "rgba(37,206,127,0.08)" : "#F5F5F5",
+              borderColor: isSelected ? "#25CE7F" : "#F5F5F5",
+              gap: 6,
+            }}
           >
-            <Text className="text-xl mb-1">{cat.emoji}</Text>
+            <MaterialCommunityIcons
+              name={cat.icon}
+              size={22}
+              color={isSelected ? "#25CE7F" : "#555"}
+            />
             <Text
-              className={`text-xs font-bold ${isSelected ? "text-[#25CE7F]" : "text-white"}`}
+              style={{
+                fontSize: 11,
+                fontWeight: "600",
+                color: isSelected ? "#25CE7F" : "#333",
+              }}
             >
               {cat.label}
             </Text>
-            <Text className="text-[10px] text-[#555] mt-0.5">
-              {cat.subtitle}
-            </Text>
-          </Pressable>
+          </TouchableOpacity>
         );
       })}
     </View>

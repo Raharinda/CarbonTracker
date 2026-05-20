@@ -5,8 +5,10 @@ import { useDevices } from "@/features/devices/hooks/useDevices";
 import { useDeviceStore } from "@/features/devices/store/deviceStore";
 import { router } from "expo-router";
 import { LogOut, Plus } from "lucide-react-native";
+import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AddDeviceSheet } from "../../devices/components/AddDeviceSheet";
 
 const CATEGORY_EMOJI: Record<string, string> = {
   electronics: "🖥️",
@@ -16,9 +18,10 @@ const CATEGORY_EMOJI: Record<string, string> = {
 };
 
 export default function DashboardScreen() {
-  const { devices } = useDevices(); //
+  const { devices } = useDevices();
   const clearDevices = useDeviceStore((s) => s.clearDevices);
   const user = useAuthStore((s) => s.user);
+  const [sheetVisible, setSheetVisible] = useState(false);
 
   const totalKwh = devices.reduce((sum, d) => sum + d.monthlyKwh, 0);
   const totalEmissions = devices.reduce(
@@ -94,7 +97,7 @@ export default function DashboardScreen() {
               Your Devices
             </Text>
             <TouchableOpacity
-              onPress={() => router.push("/(app)/add-device" as any)}
+              onPress={() => setSheetVisible(true)}
               className="flex-row items-center gap-1 bg-brand-subtle px-3 py-1.5 rounded-xl"
             >
               <Plus size={14} color="#25CE7F" />
@@ -144,6 +147,11 @@ export default function DashboardScreen() {
 
         <View className="h-8" />
       </ScrollView>
+
+      <AddDeviceSheet
+        visible={sheetVisible}
+        onClose={() => setSheetVisible(false)}
+      />
     </SafeAreaView>
   );
 }

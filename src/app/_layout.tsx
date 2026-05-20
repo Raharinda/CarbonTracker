@@ -1,11 +1,23 @@
+// app/_layout.tsx
 import { initAuthListener } from "@/features/auth/store/authStore";
 import { LoadingProvider } from "@/providers/LoadingProvider";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import "../../global.css";
+
+// ✅ Disable strict mode — fix freeze dari @gorhom/bottom-sheet
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,8 +31,8 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    const unsubscribe = initAuthListener(); // ← pindah ke sini
-    return () => unsubscribe?.(); // ← cleanup saat unmount
+    const unsubscribe = initAuthListener();
+    return () => unsubscribe?.();
   }, []);
 
   useEffect(() => {
@@ -30,9 +42,11 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <LoadingProvider>
-      <Stack screenOptions={{ headerShown: false }} />
-      <Toast />
-    </LoadingProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <LoadingProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+        <Toast />
+      </LoadingProvider>
+    </GestureHandlerRootView>
   );
 }

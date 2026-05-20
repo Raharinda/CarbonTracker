@@ -8,11 +8,12 @@ import Toast from "react-native-toast-message";
 import { z } from "zod";
 import { deviceService } from "../services/deviceService";
 import { useDeviceStore } from "../store/deviceStore";
+import { DEVICE_TYPE_TO_CATEGORY } from "../types/device.types";
 import { calcCost, calcEmissions, calcMonthlyKwh } from "../utils/carbonCalc";
 
 const schema = z.object({
   name: z.string().min(2, "Name too short").max(50),
-  category: z.enum(["electronics", "appliances", "lighting", "other"]),
+  deviceType: z.enum(["ac", "tv", "washer", "fridge", "lights", "other"]),
   watt: z.number({ error: "Required" }).min(1, "Min 1W").max(10000),
   hoursPerDay: z.number({ error: "Required" }).min(0.1, "Min 0.1h").max(24),
   daysPerMonth: z.number().min(1).max(31),
@@ -20,7 +21,10 @@ const schema = z.object({
 
 export type DeviceFormValues = z.infer<typeof schema>;
 
-export function useDeviceSetup(redirectTo: "list" | "dashboard" = "list") {
+export function useDeviceSetup(
+  redirectTo: "list" | "dashboard" = "list",
+  onSuccess?: () => void,
+) {
   const router = useRouter();
   const setDevices = useDeviceStore((s) => s.setDevices);
   const userId = useAuthStore((s) => s.user?.uid);
@@ -30,7 +34,7 @@ export function useDeviceSetup(redirectTo: "list" | "dashboard" = "list") {
   const form = useForm<DeviceFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      category: "electronics",
+      deviceType: "tv",
       watt: undefined,
       hoursPerDay: undefined,
       daysPerMonth: 30,
@@ -63,12 +67,12 @@ export function useDeviceSetup(redirectTo: "list" | "dashboard" = "list") {
     try {
       await deviceService.addDevice(userId, {
         ...data,
+        category: DEVICE_TYPE_TO_CATEGORY[data.deviceType],
         monthlyKwh: estimate.kwh,
         monthlyEmissions: estimate.emissions,
         monthlyCost: estimate.cost,
       });
 
-      // Re-fetch dari Firestore — store dijamin sync
       const updated = await deviceService.getUserDevices(userId);
       setDevices(updated);
 
@@ -79,7 +83,9 @@ export function useDeviceSetup(redirectTo: "list" | "dashboard" = "list") {
         visibilityTime: 2000,
       });
 
-      if (redirectTo === "dashboard") {
+      if (onSuccess) {
+        onSuccess();
+      } else if (redirectTo === "dashboard") {
         router.back();
       } else {
         router.replace("/(onboarding)/device-setup/complete" as any);

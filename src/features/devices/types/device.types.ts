@@ -6,26 +6,28 @@ export type DeviceCategory =
   | "lighting"
   | "other";
 
-export interface DeviceFormData {
+export type DeviceType = "ac" | "tv" | "washer" | "fridge" | "lights" | "other";
+
+export const DEVICE_TYPE_TO_CATEGORY: Record<DeviceType, DeviceCategory> = {
+  ac: "appliances",
+  washer: "appliances",
+  fridge: "appliances",
+  tv: "electronics",
+  lights: "lighting",
+  other: "other",
+};
+
+export interface Device {
+  id: string;
+  userId: string;
   name: string;
   category: DeviceCategory;
+  deviceType: DeviceType;
   watt: number;
   hoursPerDay: number;
   daysPerMonth: number;
+  monthlyKwh?: number;
+  monthlyCost?: number;
+  monthlyEmissions?: number;
+  createdAt: number;
 }
-
-export interface Device extends DeviceFormData {
-  id: string;
-  userId: string;
-  monthlyKwh: number;
-  monthlyEmissions: number;
-  monthlyCost: number;
-  createdAt: Date;
-}
-
-// untuk payload ke Firestore (tanpa id, tanpa userId — di-inject di service)
-export type CreateDevicePayload = DeviceFormData & {
-  monthlyKwh: number;
-  monthlyEmissions: number;
-  monthlyCost: number;
-};
