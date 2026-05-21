@@ -2,16 +2,16 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Controller } from "react-hook-form";
 import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { useDeviceSetup } from "../hooks/useDeviceSetup";
+import { useDeviceSetup } from "../../hooks/useDeviceSetup";
 import { CategoryGrid } from "./CategoryGrid";
 
 type Props = {

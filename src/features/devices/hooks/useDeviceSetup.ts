@@ -68,6 +68,7 @@ export function useDeviceSetup(
       await deviceService.addDevice(userId, {
         ...data,
         category: DEVICE_TYPE_TO_CATEGORY[data.deviceType],
+        active: true,
         monthlyKwh: estimate.kwh,
         monthlyEmissions: estimate.emissions,
         monthlyCost: estimate.cost,

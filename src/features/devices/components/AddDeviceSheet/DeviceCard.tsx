@@ -1,6 +1,6 @@
 // features/devices/components/DeviceCard.tsx
 import { Text, View } from "react-native";
-import type { Device } from "../types/device.types";
+import type { Device } from "../../types/device.types";
 
 const CATEGORY_EMOJI: Record<string, string> = {
   electronics: "🖥️",

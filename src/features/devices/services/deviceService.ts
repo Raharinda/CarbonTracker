@@ -18,18 +18,28 @@ import type { CreateDevicePayload, Device } from "../types/device.types";
 const COLLECTION = "devices";
 
 function toDevice(id: string, data: any): Device {
+  const createdAt = data.createdAt;
+  const createdAtMillis =
+    createdAt && typeof createdAt.toDate === "function"
+      ? createdAt.toDate().getTime()
+      : typeof createdAt === "number"
+      ? createdAt
+      : Date.now();
+
   return {
     id,
     userId: data.userId,
     name: data.name,
     category: data.category,
+    deviceType: data.deviceType,
     watt: data.watt,
     hoursPerDay: data.hoursPerDay,
     daysPerMonth: data.daysPerMonth,
+    active: data.active ?? true,
     monthlyKwh: data.monthlyKwh,
     monthlyEmissions: data.monthlyEmissions,
     monthlyCost: data.monthlyCost,
-    createdAt: data.createdAt?.toDate() ?? new Date(),
+    createdAt: createdAtMillis,
   };
 }
 

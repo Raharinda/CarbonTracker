@@ -1,7 +1,7 @@
 // features/devices/components/CategoryGrid.tsx
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Text, TouchableOpacity, View } from "react-native";
-import type { DeviceType } from "../types/device.types";
+import type { DeviceType } from "../../types/device.types";
 
 interface CategoryOption {
   value: DeviceType;

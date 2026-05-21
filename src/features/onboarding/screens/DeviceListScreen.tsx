@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AddDeviceSheet } from "../../devices/components/AddDeviceSheet";
-import { DeviceCard } from "../../devices/components/DeviceCard";
+import { DeviceCard } from "../../devices/components/AddDeviceSheet/DeviceCard";
 import { useDeviceStore } from "../../devices/store/deviceStore";
 
 export function DeviceListScreen() {

@@ -1,9 +1,1 @@
-import { Text, View } from "react-native";
-
-export default function DevicesScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-lg font-bold">Devices Screen</Text>
-    </View>
-  );
-}
+export { default } from "@/features/devices/screens/DevicesScreen";
