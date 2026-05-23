@@ -3,51 +3,65 @@ import { Text, View } from "react-native";
 
 type Props = {
   totalKwh: number;
-  comparedToYesterday?: number | null; // % change, bisa null kalau tidak ada data kemarin
+  comparedToYesterday?: number | null;
 };
 
 export function EnergyHeader({ totalKwh, comparedToYesterday }: Props) {
   const isDown = comparedToYesterday != null && comparedToYesterday <= 0;
+
   const hasComparison = comparedToYesterday != null;
 
   return (
-    <View className="mx-4 mt-4 rounded-[28px] bg-brand px-6 py-6">
-      {/* Status pill */}
-      <View className="self-start rounded-full bg-black/20 px-4 py-1.5 mb-4">
-        <Text className="text-xs font-semibold text-white">
-          {isDown ? "Energy Flow Stable" : "Usage Increasing"}
-        </Text>
+    <View className="mx-5 mt-5 overflow-hidden rounded-[34px] bg-white px-6 py-7 shadow-sm shadow-black/10">
+      {/* BACKGROUND BARS */}
+      <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between px-2 opacity-40">
+        {[60, 100, 140, 80, 130, 95].map((h, i) => (
+          <View
+            key={i}
+            className="w-[48px] rounded-t-[18px] bg-[#DDF5E7]"
+            style={{ height: h }}
+          />
+        ))}
       </View>
 
-      {/* Main number */}
-      <Text className="text-[10px] uppercase tracking-widest text-white/70 mb-1">
-        Current Usage
+      {/* TITLE */}
+      <Text className="text-center text-[14px] font-black tracking-[3px] text-[#2F2F2F]">
+        CURRENT USAGE
       </Text>
-      <View className="flex-row items-end gap-2">
+
+      {/* MAIN CONTENT */}
+      <View className="mt-4 flex-row items-center justify-center">
         {hasComparison &&
           (isDown ? (
-            <TrendingDown size={32} color="#FFFFFF" />
+            <TrendingDown size={58} color="#F59E0B" strokeWidth={2.5} />
           ) : (
-            <TrendingUp size={32} color="#FFFFFF" />
+            <TrendingUp size={58} color="#EF4444" strokeWidth={2.5} />
           ))}
-        <Text className="text-5xl font-extrabold text-white">
-          {totalKwh.toFixed(1)}
-        </Text>
-        <Text className="text-xl font-semibold text-white/80 mb-1">kWh</Text>
+
+        <View className="ml-2 flex-row items-end">
+          <Text className="text-[64px] font-black leading-none text-[#111]">
+            {totalKwh.toFixed(1)}
+          </Text>
+
+          <Text className="mb-2 ml-2 text-[30px] font-medium text-[#2B2B2B]">
+            kWh
+          </Text>
+        </View>
       </View>
 
-      {/* Badges */}
-      <View className="flex-row gap-2 mt-4 flex-wrap">
+      {/* BADGES */}
+      <View className="mt-5 items-center gap-3">
         {hasComparison && (
-          <View className="rounded-full bg-white/20 px-3 py-1">
-            <Text className="text-xs font-semibold text-white">
+          <View className="rounded-full bg-[#2DD881] px-5 py-2">
+            <Text className="text-[14px] font-bold text-white">
               {Math.abs(comparedToYesterday!).toFixed(0)}%{" "}
               {isDown ? "lower" : "higher"} than yesterday
             </Text>
           </View>
         )}
-        <View className="rounded-full bg-white/20 px-3 py-1">
-          <Text className="text-xs font-semibold text-white">
+
+        <View className="rounded-full bg-[#F7D7A8] px-5 py-2">
+          <Text className="text-[14px] font-bold text-[#5B4631]">
             {isDown ? "Efficient Energy Pattern" : "Consider reducing usage"}
           </Text>
         </View>

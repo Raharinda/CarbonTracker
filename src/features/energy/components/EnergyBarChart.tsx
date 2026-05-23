@@ -10,56 +10,79 @@ function getDayLabel(dateStr: string): string {
   return date.toLocaleDateString("en-US", { weekday: "short" }).slice(0, 1);
 }
 
-export function EnergyBarChart({ history }: Props) {
-  // Ambil 7 hari terakhir, urutkan ascending
-  const last7 = [...history]
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(-7);
+function getWeekDates(reference: Date): string[] {
+  const date = new Date(reference);
+  const day = date.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const monday = new Date(date);
+  monday.setDate(date.getDate() + mondayOffset);
 
-  const maxKwh = Math.max(...last7.map((d) => d.totalKwh), 0.1);
+  return Array.from({ length: 7 }).map((_, index) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + index);
+    return d.toISOString().split("T")[0];
+  });
+}
+
+export function EnergyBarChart({ history }: Props) {
+  const weekDates = getWeekDates(new Date());
   const todayStr = new Date().toISOString().split("T")[0];
+  const historyByDate = new Map(
+    history.map((item) => [item.date, item.totalKwh]),
+  );
+
+  const weekData = weekDates.map((date) => ({
+    date,
+    totalKwh: historyByDate.get(date) ?? 0,
+  }));
+
+  const maxKwh = Math.max(...weekData.map((d) => d.totalKwh), 0.1);
 
   return (
-    <View className="mx-4 rounded-3xl bg-white p-5 shadow-sm shadow-black/5">
-      <View className="flex-row items-center justify-between mb-4">
-        <Text className="text-sm font-bold text-[#0E0E0E]">
+    <View className="mx-5 rounded-[30px] bg-white px-5 py-6 shadow-sm shadow-black/10">
+      <View className="mb-6 flex-row items-center justify-between">
+        <Text className="text-[18px] font-bold text-[#27C76F]">
           Weekly Usage Flow
         </Text>
-        <Text className="text-xs text-[#888]">Mon — Sun</Text>
+
+        <Text className="text-[14px] font-medium text-[#6FCF97]">
+          Mon — Sun
+        </Text>
       </View>
 
-      <View className="flex-row items-end justify-between h-20 gap-1">
-        {last7.length === 0
-          ? // Placeholder bars kalau belum ada data
-            Array.from({ length: 7 }).map((_, i) => (
-              <View key={i} className="flex-1 items-center gap-1">
-                <View className="flex-1 w-full rounded-full bg-[#F0F0F0]" />
-                <Text className="text-[10px] text-[#CCC]">—</Text>
-              </View>
-            ))
-          : last7.map((day) => {
-              const heightPercent = (day.totalKwh / maxKwh) * 100;
-              const isToday = day.date === todayStr;
-              return (
-                <View key={day.date} className="flex-1 items-center gap-1">
-                  <View className="flex-1 w-full justify-end">
-                    <View
-                      className={`w-full rounded-full ${
-                        isToday ? "bg-brand" : "bg-[#E0E0E0]"
-                      }`}
-                      style={{ height: `${Math.max(heightPercent, 8)}%` }}
-                    />
-                  </View>
-                  <Text
-                    className={`text-[10px] ${
-                      isToday ? "text-brand font-bold" : "text-[#AAA]"
-                    }`}
-                  >
-                    {getDayLabel(day.date)}
-                  </Text>
-                </View>
-              );
-            })}
+      <View className="flex-row items-end justify-between h-44 mt-2 px-1">
+        {weekData.map((day) => {
+          const heightPercent = (day.totalKwh / maxKwh) * 100;
+          const isToday = day.date === todayStr;
+
+          const barHeight = day.totalKwh <= 0 ? 6 : Math.max(heightPercent, 18);
+
+          return (
+            <View
+              key={day.date}
+              className="items-center justify-end"
+              style={{ width: 24 }}
+            >
+              <View
+                className={`rounded-full ${
+                  isToday ? "bg-[#27C76F]" : "bg-[#E3E3E3]"
+                }`}
+                style={{
+                  width: 9,
+                  height: `${barHeight}%`,
+                }}
+              />
+
+              <Text
+                className={`mt-2 text-[10px] ${
+                  isToday ? "text-[#27C76F] font-bold" : "text-[#B5B5B5]"
+                }`}
+              >
+                {getDayLabel(day.date)}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
