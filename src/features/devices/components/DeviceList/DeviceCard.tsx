@@ -9,18 +9,14 @@ type Props = {
 };
 
 function formatDuration(durationMs: number): string {
-  const totalSeconds = Math.floor(durationMs / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const totalMinutes = Math.max(0, Math.floor(durationMs / 1000 / 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
 
   if (hours > 0) {
     return `${hours}h ${minutes}m`;
   }
-  if (minutes > 0) {
-    return `${minutes}m ${seconds}s`;
-  }
-  return `${seconds}s`;
+  return `${minutes}m`;
 }
 
 export function DeviceCard({ device, now, onToggle }: Props) {

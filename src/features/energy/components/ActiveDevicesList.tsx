@@ -147,15 +147,10 @@ export function ActiveDevicesList({ today }: Props) {
               ? record.kwh
               : (watt * (totalMinutes / 60)) / 1000;
 
-          const hours = Math.floor(totalMinutes / 60);
-          const mins = Math.floor(totalMinutes % 60);
-          const secs = Math.floor((totalMinutes * 60) % 60);
-          const durationLabel =
-            hours > 0
-              ? `${hours}h ${mins}m`
-              : mins > 0
-                ? `${mins}m ${secs}s`
-                : `${secs}s`;
+          const displayMinutes = Math.floor(totalMinutes);
+          const hours = Math.floor(displayMinutes / 60);
+          const mins = displayMinutes % 60;
+          const durationLabel = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
           return (
             <View
@@ -178,7 +173,7 @@ export function ActiveDevicesList({ today }: Props) {
                     {liveDevice && (
                       <View className="rounded-full bg-[#E8FFF4] px-1.5 py-0.5">
                         <Text className="text-[10px] font-semibold text-brand">
-                          LIVE
+                          Active
                         </Text>
                       </View>
                     )}
