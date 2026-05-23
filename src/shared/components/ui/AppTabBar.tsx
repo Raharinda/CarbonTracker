@@ -17,10 +17,8 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
   return (
     <View
       style={{
-        position: "absolute",
-        bottom: insets.bottom + 16,
-        left: 24,
-        right: 24,
+        marginHorizontal: 24,
+        marginBottom: insets.bottom + 16,
         backgroundColor: "#F0F0F0",
         borderRadius: 32,
         paddingVertical: 10,

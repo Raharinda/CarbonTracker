@@ -1,13 +1,14 @@
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
-  DeviceCard,
-  DeviceEmptyState,
-  DeviceFilterBar,
-  DeviceScreenHeader,
-  DeviceStatsRow,
+    DeviceCard,
+    DeviceEmptyState,
+    DeviceFilterBar,
+    DeviceScreenHeader,
+    DeviceStatsRow,
 } from "../components/DeviceList";
 
 import { useActiveDeviceTimer } from "../hooks/useActiveDeviceTimer";
@@ -15,7 +16,13 @@ import { useDeviceList } from "../hooks/useDeviceList";
 
 export default function DevicesScreen() {
   useActiveDeviceTimer();
+  const [now, setNow] = useState(Date.now());
   const router = useRouter();
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const {
     allItems,
@@ -61,6 +68,7 @@ export default function DevicesScreen() {
               <DeviceCard
                 key={device.id}
                 device={device}
+                now={now}
                 onToggle={toggleActive}
               />
             ))

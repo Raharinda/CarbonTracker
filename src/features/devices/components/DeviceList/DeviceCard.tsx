@@ -4,10 +4,32 @@ import type { DeviceListItem } from "../../hooks/useDeviceList";
 
 type Props = {
   device: DeviceListItem;
+  now: number;
   onToggle: (id: string) => void;
 };
 
-export function DeviceCard({ device, onToggle }: Props) {
+function formatDuration(durationMs: number): string {
+  const totalSeconds = Math.floor(durationMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+  return `${seconds}s`;
+}
+
+export function DeviceCard({ device, now, onToggle }: Props) {
+  const durationLabel = device.active
+    ? device.activatedAt
+      ? `Active ${formatDuration(now - device.activatedAt)}`
+      : "Active"
+    : "Tap to start";
+
   return (
     <View className="rounded-3xl bg-white p-4 shadow-sm shadow-black/5 flex-row items-center justify-between">
       <View className="flex-row items-center gap-3 flex-1 mr-3">
@@ -26,6 +48,13 @@ export function DeviceCard({ device, onToggle }: Props) {
       </View>
 
       <View className="items-end">
+        <Text
+          className={`text-[10px] mb-1 ${
+            device.active ? "text-brand" : "text-[#888]"
+          }`}
+        >
+          {durationLabel || "Tap to start"}
+        </Text>
         <Text className="text-xs text-[#888] mb-1">{device.usageLabel}</Text>
         <Switch
           value={device.active}

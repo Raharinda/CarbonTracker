@@ -1,16 +1,16 @@
 import { db } from "@/config/firebase";
 import { CARBON_CONFIG } from "@/shared/config/carbonConfig";
 import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  onSnapshot,
-  orderBy,
-  query,
-  setDoc,
-  where,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    limitToLast,
+    onSnapshot,
+    orderBy,
+    query,
+    setDoc,
+    where,
 } from "firebase/firestore";
 import type { DailyUsage, DeviceDailyRecord } from "../types/dailyUsage.types";
 
@@ -49,8 +49,8 @@ export const dailyUsageService = {
     const q = query(
       collection(db, COLLECTION),
       where("userId", "==", userId),
-      orderBy("date", "desc"),
-      limit(days),
+      orderBy("date", "asc"),
+      limitToLast(days),
     );
     const snap = await getDocs(q);
     return snap.docs.map((d) => toDailyUsage(d.id, d.data()));
@@ -75,8 +75,8 @@ export const dailyUsageService = {
     const q = query(
       collection(db, COLLECTION),
       where("userId", "==", userId),
-      orderBy("date", "desc"),
-      limit(days),
+      orderBy("date", "asc"),
+      limitToLast(days),
     );
     return onSnapshot(q, (snap) => {
       onData(snap.docs.map((d) => toDailyUsage(d.id, d.data())));

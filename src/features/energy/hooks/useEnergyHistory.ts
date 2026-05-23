@@ -11,6 +11,10 @@ type EnergyHistoryState = {
   refetch: () => void;
 };
 
+function sortHistoryByDateAscending(history: DailyUsage[]): DailyUsage[] {
+  return [...history].sort((a, b) => a.date.localeCompare(b.date));
+}
+
 export function useEnergyHistory(): EnergyHistoryState {
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
@@ -34,7 +38,7 @@ export function useEnergyHistory(): EnergyHistoryState {
         dailyUsageService.getHistory(user.uid, 30),
       ]);
       setToday(todayData);
-      setHistory(historyData);
+      setHistory(sortHistoryByDateAscending(historyData));
     } catch (e) {
       setError("Gagal memuat data energi");
     } finally {
@@ -64,7 +68,7 @@ export function useEnergyHistory(): EnergyHistoryState {
       user.uid,
       30,
       (data) => {
-        setHistory(data);
+        setHistory(sortHistoryByDateAscending(data));
         setHistoryLoaded(true);
       },
     );

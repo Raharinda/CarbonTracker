@@ -13,6 +13,7 @@ export type DeviceListItem = {
   watt: number;
   usageLabel: string;
   active: boolean;
+  activatedAt?: number | null;
 };
 
 export type DeviceFilter = "all" | "active";
@@ -39,6 +40,7 @@ export function useDeviceList() {
         watt: device.watt,
         usageLabel: toUsageLabel(device),
         active: device.active,
+        activatedAt: device.activatedAt,
       })),
     [devices],
   );
