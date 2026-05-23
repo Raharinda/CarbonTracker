@@ -3,11 +3,11 @@ import { router } from "expo-router";
 import { ArrowLeft, PlusCircle } from "lucide-react-native";
 import { useState } from "react";
 import {
-    Pressable,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AddDeviceSheet } from "../../devices/components/AddDeviceSheet";

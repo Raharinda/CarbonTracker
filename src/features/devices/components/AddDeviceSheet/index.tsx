@@ -1,4 +1,4 @@
-// features/devices/components/AddDeviceSheet.tsx
+// features/devices/components/AddDeviceSheet/index.tsx
 import Feather from "@expo/vector-icons/Feather";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -6,14 +6,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { useMemo, useRef } from "react";
 import { Controller } from "react-hook-form";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useDeviceSetup } from "../../hooks/useDeviceSetup";
 import { CategoryGrid } from "./CategoryGrid";
 
@@ -50,6 +43,9 @@ export function AddDeviceSheet({ visible, onClose }: Props) {
         index={1}
         snapPoints={snapPoints}
         enablePanDownToClose
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustResize"
         onChange={(index) => {
           if (index === -1) {
             onClose();
@@ -75,170 +71,163 @@ export function AddDeviceSheet({ visible, onClose }: Props) {
           width: 36,
         }}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
+        <BottomSheetScrollView
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <BottomSheetScrollView
-            contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <StepLabel step={1} title="Device Category" />
-            <Controller
-              name="deviceType"
-              control={control}
-              render={({ field }) => (
-                <CategoryGrid value={field.value} onChange={field.onChange} />
-              )}
-            />
-
-            <StepLabel step={2} title="Identity" />
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#F5F5F5",
-                    borderRadius: 14,
-                    paddingHorizontal: 16,
-                    paddingVertical: 14,
-                  }}
-                >
-                  <TextInput
-                    style={{ flex: 1, fontSize: 14, color: "#111" }}
-                    placeholder="e.g. Master Bedroom AC"
-                    placeholderTextColor="#ABABAB"
-                    onChangeText={field.onChange}
-                    value={field.value}
-                  />
-                  <Feather name="edit-3" size={16} color="#25CE7F" />
-                </View>
-              )}
-            />
-            {errors.name && (
-              <Text style={{ color: "#f87171", fontSize: 12, marginTop: 4 }}>
-                {errors.name.message}
-              </Text>
+          <StepLabel step={1} title="Device Category" />
+          <Controller
+            name="deviceType"
+            control={control}
+            render={({ field }) => (
+              <CategoryGrid value={field.value} onChange={field.onChange} />
             )}
+          />
 
-            <StepLabel step={3} title="Energy Consumption" />
+          <StepLabel step={2} title="Identity" />
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "#F5F5F5",
+                  borderRadius: 14,
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
+                }}
+              >
+                <TextInput
+                  style={{ flex: 1, fontSize: 14, color: "#111" }}
+                  placeholder="e.g. Master Bedroom AC"
+                  placeholderTextColor="#ABABAB"
+                  onChangeText={field.onChange}
+                  value={field.value}
+                />
+                <Feather name="edit-3" size={16} color="#25CE7F" />
+              </View>
+            )}
+          />
+          {errors.name && (
+            <Text style={{ color: "#f87171", fontSize: 12, marginTop: 4 }}>
+              {errors.name.message}
+            </Text>
+          )}
+
+          <StepLabel step={3} title="Energy Consumption" />
+          <Controller
+            name="watt"
+            control={control}
+            render={({ field }) => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "#F5F5F5",
+                  borderRadius: 14,
+                  paddingHorizontal: 16,
+                  paddingVertical: 14,
+                  marginBottom: 10,
+                }}
+              >
+                <TextInput
+                  style={{ flex: 1, fontSize: 14, color: "#111" }}
+                  placeholder="Wattage (W)"
+                  placeholderTextColor="#ABABAB"
+                  keyboardType="numeric"
+                  onChangeText={(val) => field.onChange(Number(val) || 0)}
+                  value={field.value ? String(field.value) : ""}
+                />
+                <Text
+                  style={{
+                    color: "#25CE7F",
+                    fontWeight: "700",
+                    fontSize: 14,
+                  }}
+                >
+                  Watts
+                </Text>
+              </View>
+            )}
+          />
+
+          <View style={{ flexDirection: "row", gap: 10 }}>
             <Controller
-              name="watt"
+              name="hoursPerDay"
               control={control}
               render={({ field }) => (
                 <View
                   style={{
+                    flex: 1,
                     flexDirection: "row",
                     alignItems: "center",
                     backgroundColor: "#F5F5F5",
                     borderRadius: 14,
                     paddingHorizontal: 16,
                     paddingVertical: 14,
-                    marginBottom: 10,
                   }}
                 >
                   <TextInput
                     style={{ flex: 1, fontSize: 14, color: "#111" }}
-                    placeholder="Wattage (W)"
+                    placeholder="Hours/day"
                     placeholderTextColor="#ABABAB"
                     keyboardType="numeric"
                     onChangeText={(val) => field.onChange(Number(val) || 0)}
                     value={field.value ? String(field.value) : ""}
                   />
-                  <Text
-                    style={{
-                      color: "#25CE7F",
-                      fontWeight: "700",
-                      fontSize: 14,
-                    }}
-                  >
-                    Watts
-                  </Text>
+                  <Text style={{ color: "#ABABAB", fontSize: 13 }}>h</Text>
                 </View>
               )}
             />
+            <Controller
+              name="daysPerMonth"
+              control={control}
+              render={({ field }) => (
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: "#F5F5F5",
+                    borderRadius: 14,
+                    paddingHorizontal: 16,
+                    paddingVertical: 14,
+                  }}
+                >
+                  <TextInput
+                    style={{ flex: 1, fontSize: 14, color: "#111" }}
+                    placeholder="Days/month"
+                    placeholderTextColor="#ABABAB"
+                    keyboardType="numeric"
+                    onChangeText={(val) => field.onChange(Number(val) || 30)}
+                    value={field.value ? String(field.value) : ""}
+                  />
+                  <Text style={{ color: "#ABABAB", fontSize: 13 }}>d</Text>
+                </View>
+              )}
+            />
+          </View>
 
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Controller
-                name="hoursPerDay"
-                control={control}
-                render={({ field }) => (
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      backgroundColor: "#F5F5F5",
-                      borderRadius: 14,
-                      paddingHorizontal: 16,
-                      paddingVertical: 14,
-                    }}
-                  >
-                    <TextInput
-                      style={{ flex: 1, fontSize: 14, color: "#111" }}
-                      placeholder="Hours/day"
-                      placeholderTextColor="#ABABAB"
-                      keyboardType="numeric"
-                      onChangeText={(val) => field.onChange(Number(val) || 0)}
-                      value={field.value ? String(field.value) : ""}
-                    />
-                    <Text style={{ color: "#ABABAB", fontSize: 13 }}>h</Text>
-                  </View>
-                )}
-              />
-              <Controller
-                name="daysPerMonth"
-                control={control}
-                render={({ field }) => (
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      backgroundColor: "#F5F5F5",
-                      borderRadius: 14,
-                      paddingHorizontal: 16,
-                      paddingVertical: 14,
-                    }}
-                  >
-                    <TextInput
-                      style={{ flex: 1, fontSize: 14, color: "#111" }}
-                      placeholder="Days/month"
-                      placeholderTextColor="#ABABAB"
-                      keyboardType="numeric"
-                      onChangeText={(val) => field.onChange(Number(val) || 30)}
-                      value={field.value ? String(field.value) : ""}
-                    />
-                    <Text style={{ color: "#ABABAB", fontSize: 13 }}>d</Text>
-                  </View>
-                )}
-              />
-            </View>
-
-            <TouchableOpacity
-              onPress={onSubmit}
-              disabled={isSubmitting}
-              style={{
-                marginTop: 28,
-                backgroundColor: "#111111",
-                borderRadius: 20,
-                paddingVertical: 18,
-                alignItems: "center",
-                opacity: isSubmitting ? 0.6 : 1,
-              }}
-            >
-              <Text
-                style={{ color: "#25CE7F", fontWeight: "700", fontSize: 16 }}
-              >
-                {isSubmitting ? "Adding..." : "Finish Set Up"}
-              </Text>
-            </TouchableOpacity>
-          </BottomSheetScrollView>
-        </KeyboardAvoidingView>
+          <TouchableOpacity
+            onPress={onSubmit}
+            disabled={isSubmitting}
+            style={{
+              marginTop: 28,
+              backgroundColor: "#111111",
+              borderRadius: 20,
+              paddingVertical: 18,
+              alignItems: "center",
+              opacity: isSubmitting ? 0.6 : 1,
+            }}
+          >
+            <Text style={{ color: "#25CE7F", fontWeight: "700", fontSize: 16 }}>
+              {isSubmitting ? "Adding..." : "Finish Set Up"}
+            </Text>
+          </TouchableOpacity>
+        </BottomSheetScrollView>
       </BottomSheet>
     </View>
   );
