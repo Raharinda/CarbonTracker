@@ -1,11 +1,8 @@
-// REGISTER SCREEN
-
+// features/auth/screens/RegisterScreen.tsx
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
-
 import { ArrowLeft, Lock, Mail, User } from "lucide-react-native";
-
 import React from "react";
-
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -15,17 +12,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
-
 import { FormField } from "../components/FormFields";
 import { useRegisterForm } from "../hooks/useAuthForm";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
+import { useGuestLogin } from "../hooks/useGuestLogin";
 
 export function RegisterScreen() {
   const { form, onSubmit, error, isLoading } = useRegisterForm();
-
   const { promptAsync } = useGoogleAuth();
+  const { loginAsGuest, isLoading: isGuestLoading } = useGuestLogin();
 
   return (
     <KeyboardAvoidingView
@@ -47,16 +42,14 @@ export function RegisterScreen() {
           className="flex-row items-center gap-2 mt-14 mb-10"
         >
           <ArrowLeft size={18} color="#25CE7F" />
-
           <Text className="text-brand font-extrabold text-[22px]">Wattly</Text>
         </TouchableOpacity>
 
         {/* Hero */}
         <View className="items-center mb-10">
           <Text className="text-brand text-[44px] font-extrabold leading-none">
-            Join X
+            Join Wattly
           </Text>
-
           <Text className="text-zinc-500 text-center text-[15px] leading-5 mt-4 px-5">
             Step into the future of sustainable living{"\n"}
             with a personal touch.
@@ -70,7 +63,6 @@ export function RegisterScreen() {
             {/* Apple */}
             <TouchableOpacity className="flex-1 h-11 rounded-full border border-brand items-center justify-center flex-row gap-2">
               <FontAwesome5 name="apple" size={18} color="#25CE7F" />
-
               <Text className="text-brand text-sm font-semibold">
                 Continue with
               </Text>
@@ -82,11 +74,19 @@ export function RegisterScreen() {
               className="flex-1 h-11 rounded-full border border-brand items-center justify-center flex-row gap-2"
             >
               <AntDesign name="google" size={18} color="#25CE7F" />
-
               <Text className="text-brand text-sm font-semibold">
                 Continue with
               </Text>
             </TouchableOpacity>
+          </View>
+
+          {/* Divider */}
+          <View className="flex-row items-center gap-3 mb-5">
+            <View className="flex-1 h-px bg-zinc-200" />
+            <Text className="text-zinc-400 text-xs font-medium">
+              or with email
+            </Text>
+            <View className="flex-1 h-px bg-zinc-200" />
           </View>
 
           <FormField
@@ -120,16 +120,41 @@ export function RegisterScreen() {
           <Text className="text-red-500 text-sm text-center mt-4">{error}</Text>
         )}
 
+        {/* Register Button */}
         <TouchableOpacity
           onPress={onSubmit}
-          disabled={isLoading}
+          disabled={isLoading || isGuestLoading}
           className="bg-brand h-14 rounded-full items-center justify-center mt-10"
+          style={{ opacity: isLoading || isGuestLoading ? 0.7 : 1 }}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <Text className="text-white font-extrabold text-lg">
               Create An Account
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        {/* Divider */}
+        <View className="flex-row items-center gap-3 mt-6">
+          <View className="flex-1 h-px bg-zinc-200" />
+          <Text className="text-zinc-400 text-xs font-medium">or</Text>
+          <View className="flex-1 h-px bg-zinc-200" />
+        </View>
+
+        {/* Guest Login Button */}
+        <TouchableOpacity
+          onPress={loginAsGuest}
+          disabled={isLoading || isGuestLoading}
+          className="h-14 rounded-full items-center justify-center mt-4 border border-zinc-200 bg-white"
+          style={{ opacity: isLoading || isGuestLoading ? 0.7 : 1 }}
+        >
+          {isGuestLoading ? (
+            <ActivityIndicator color="#25CE7F" />
+          ) : (
+            <Text className="text-zinc-500 font-semibold text-base">
+              Continue as Guest
             </Text>
           )}
         </TouchableOpacity>

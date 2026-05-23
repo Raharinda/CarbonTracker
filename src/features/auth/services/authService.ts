@@ -1,11 +1,13 @@
+// features/auth/services/authService.ts
 import { auth } from "@/config/firebase";
 import {
-    createUserWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithCredential,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInAnonymously,
+  signInWithCredential,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
 } from "firebase/auth";
 
 export const authService = {
@@ -29,6 +31,10 @@ export const authService = {
   async loginWithGoogle(idToken: string): Promise<void> {
     const credential = GoogleAuthProvider.credential(idToken);
     await signInWithCredential(auth, credential);
+  },
+
+  async loginAsGuest(): Promise<void> {
+    await signInAnonymously(auth);
   },
 
   async logout(): Promise<void> {
