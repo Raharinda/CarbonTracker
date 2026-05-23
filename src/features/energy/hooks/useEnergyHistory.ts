@@ -18,6 +18,8 @@ export function useEnergyHistory(): EnergyHistoryState {
   const [history, setHistory] = useState<DailyUsage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [todayLoaded, setTodayLoaded] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
 
   async function fetchData() {
     if (!user?.uid) {
@@ -36,18 +38,41 @@ export function useEnergyHistory(): EnergyHistoryState {
     } catch (e) {
       setError("Gagal memuat data energi");
     } finally {
-      setIsLoading(false); // ← ini yang hilang
+      setIsLoading(false);
     }
   }
+
   useEffect(() => {
-    console.log(
-      "effect triggered, isAuthLoading:",
-      isAuthLoading,
-      "uid:",
-      user?.uid,
+    if (todayLoaded && historyLoaded) {
+      setIsLoading(false);
+    }
+  }, [todayLoaded, historyLoaded]);
+
+  useEffect(() => {
+    if (isAuthLoading || !user?.uid) return;
+    setError(null);
+    setIsLoading(true);
+    setTodayLoaded(false);
+    setHistoryLoaded(false);
+
+    const unsubscribeToday = dailyUsageService.listenToday(user.uid, (data) => {
+      setToday(data);
+      setTodayLoaded(true);
+    });
+
+    const unsubscribeHistory = dailyUsageService.listenHistory(
+      user.uid,
+      30,
+      (data) => {
+        setHistory(data);
+        setHistoryLoaded(true);
+      },
     );
-    if (isAuthLoading) return;
-    fetchData();
+
+    return () => {
+      unsubscribeToday();
+      unsubscribeHistory();
+    };
   }, [user?.uid, isAuthLoading]);
 
   return { today, history, isLoading, error, refetch: fetchData };

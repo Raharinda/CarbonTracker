@@ -1,3 +1,5 @@
+import { useActiveDeviceTimer } from "@/features/devices/hooks/useActiveDeviceTimer";
+import { useDevices } from "@/features/devices/hooks/useDevices";
 import AppLoading from "@/shared/components/feedback/AppLoading";
 import { ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,6 +22,8 @@ function getComparedToYesterday(
 }
 
 export default function EnergyScreen() {
+  useDevices(); // ← populate devices store
+  useActiveDeviceTimer();
   const { today, history, isLoading, error } = useEnergyHistory();
 
   if (isLoading) {

@@ -1,9 +1,9 @@
 import { useDeviceStore } from "@/features/devices/store/deviceStore";
-import { useTimerStore } from "@/features/devices/store/timerStore";
+import { useTogglingStore } from "@/features/devices/store/togglingStore";
 import { Plug, Zap } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
-import type { DailyUsage } from "../types/dailyUsage.types";
+import type { DailyUsage, DeviceDailyRecord } from "../types/dailyUsage.types";
 
 type Props = {
   today: DailyUsage | null;
@@ -11,18 +11,28 @@ type Props = {
 
 export function ActiveDevicesList({ today }: Props) {
   const devices = useDeviceStore((s) => s.devices);
-  const timers = useTimerStore((s) => s.timers);
-  const togglingIds = useTimerStore((s) => s.togglingIds);
+  const togglingIds = useTogglingStore((s) => s.togglingIds);
   const [now, setNow] = useState(Date.now());
+  const frozenMinutesRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const deviceEntries = today ? Object.entries(today.devices) : [];
+  const firestoreEntries = today ? Object.entries(today.devices) : [];
+  const firestoreIds = new Set(firestoreEntries.map(([id]) => id));
 
-  if (deviceEntries.length === 0) {
+  const liveOnlyDevices = devices.filter(
+    (d) => d.active && d.activatedAt && !firestoreIds.has(d.id),
+  );
+
+  const allEntries: [string, DeviceDailyRecord | null][] = [
+    ...firestoreEntries,
+    ...liveOnlyDevices.map((d) => [d.id, null] as [string, null]),
+  ];
+
+  if (allEntries.length === 0) {
     return (
       <View className="mx-4 rounded-3xl bg-white p-5 shadow-sm shadow-black/5">
         <View className="flex-row items-center justify-between mb-4">
@@ -55,13 +65,13 @@ export function ActiveDevicesList({ today }: Props) {
         <View className="flex-row items-center gap-1">
           <Zap size={12} color="#25CE7F" />
           <Text className="text-xs text-brand font-semibold">
-            {deviceEntries.length} tracked
+            {allEntries.length} tracked
           </Text>
         </View>
       </View>
 
       <View className="gap-3">
-        {deviceEntries.map(([deviceId, record]) => {
+        {allEntries.map(([deviceId, record]) => {
           const isToggling = togglingIds.has(deviceId);
           const liveDevice = !isToggling
             ? devices.find(
@@ -69,18 +79,33 @@ export function ActiveDevicesList({ today }: Props) {
               )
             : undefined;
 
-          const timer = timers[deviceId];
+          const watt = record?.watt ?? liveDevice?.watt ?? 0;
+          const name = record?.name ?? liveDevice?.name ?? deviceId;
 
-          // Single source of truth: timerStore
-          const totalMinutes = timer
-            ? liveDevice && timer.activatedAt > 0
-              ? timer.totalMinutesBefore + (now - timer.activatedAt) / 1000 / 60
-              : timer.totalMinutesBefore
-            : record.durationMinutes; // fallback saat app baru dibuka
+          const flushedMinutes = record?.durationMinutes ?? 0;
+          const extraMinutes = liveDevice?.activatedAt
+            ? (now - liveDevice.activatedAt) / 1000 / 60
+            : 0;
+          const currentMinutes = flushedMinutes + extraMinutes;
 
-          const totalKwh = liveDevice
-            ? (liveDevice.watt * (totalMinutes / 60)) / 1000
-            : record.kwh;
+          // Freeze nilai saat toggle OFF dimulai
+          if (isToggling && frozenMinutesRef.current[deviceId] === undefined) {
+            frozenMinutesRef.current[deviceId] = currentMinutes;
+          }
+          // Clear freeze saat onSnapshot sudah update dengan nilai baru
+          if (!isToggling && frozenMinutesRef.current[deviceId] !== undefined) {
+            delete frozenMinutesRef.current[deviceId];
+          }
+
+          const totalMinutes = isToggling
+            ? (frozenMinutesRef.current[deviceId] ?? currentMinutes)
+            : currentMinutes;
+
+          const totalKwh =
+            record?.kwh != null
+              ? record.kwh +
+                (liveDevice ? (watt * (extraMinutes / 60)) / 1000 : 0)
+              : (watt * (totalMinutes / 60)) / 1000;
 
           const hours = Math.floor(totalMinutes / 60);
           const mins = Math.floor(totalMinutes % 60);
@@ -108,7 +133,7 @@ export function ActiveDevicesList({ today }: Props) {
                 <View>
                   <View className="flex-row items-center gap-2">
                     <Text className="text-sm font-semibold text-[#0E0E0E]">
-                      {record.name}
+                      {name}
                     </Text>
                     {liveDevice && (
                       <View className="rounded-full bg-[#E8FFF4] px-1.5 py-0.5">
@@ -126,7 +151,7 @@ export function ActiveDevicesList({ today }: Props) {
                     )}
                   </View>
                   <Text className="text-xs text-[#888]">
-                    {record.watt}W · {durationLabel}
+                    {watt}W · {durationLabel}
                   </Text>
                 </View>
               </View>

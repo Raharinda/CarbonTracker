@@ -1,7 +1,6 @@
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { dailyUsageService } from "@/features/energy/services/dailyUsageService";
 import { deviceService } from "../services/deviceService";
-import { useTimerStore } from "../store/timerStore";
 import type { Device } from "../types/device.types";
 
 export function useDeviceToggle() {
@@ -13,18 +12,9 @@ export function useDeviceToggle() {
     userId: string,
   ): Promise<void> {
     if (!device.activatedAt) return;
-
-    const timer = useTimerStore.getState().timers[device.id];
-    // Flush dari activatedAt timer (sudah di-update setiap interval)
-    const flushFrom =
-      timer?.activatedAt && timer.activatedAt > 0
-        ? timer.activatedAt
-        : device.activatedAt;
-
-    const durationMs = until.getTime() - flushFrom;
+    const durationMs = until.getTime() - device.activatedAt;
     const durationMinutes = durationMs / 1000 / 60;
     if (durationMinutes <= 0) return;
-
     const kwh = (device.watt * (durationMinutes / 60)) / 1000;
     await dailyUsageService.accumulateDeviceUsage(userId, until, device.id, {
       name: device.name,
@@ -37,7 +27,6 @@ export function useDeviceToggle() {
   async function toggleDevice(device: Device): Promise<void> {
     if (!user?.uid) return;
     const now = new Date();
-
     if (!device.active) {
       await deviceService.updateDevice(device.id, {
         active: true,
@@ -45,7 +34,6 @@ export function useDeviceToggle() {
       });
     } else {
       await flushDeviceUsage(device, now, user.uid);
-      // stopTimer sudah dipanggil di useDeviceList sebelum toggleDevice
       await deviceService.updateDevice(device.id, {
         active: false,
         activatedAt: null,
@@ -57,13 +45,12 @@ export function useDeviceToggle() {
     if (!user?.uid) return;
     const now = new Date();
     const activeDevices = devices.filter((d) => d.active && d.activatedAt);
-
     await Promise.all(
-      activeDevices.map((device) => flushDeviceUsage(device, now, user.uid!)),
+      activeDevices.map((d) => flushDeviceUsage(d, now, user.uid!)),
     );
     await Promise.all(
-      activeDevices.map((device) =>
-        deviceService.updateDevice(device.id, { activatedAt: now.getTime() }),
+      activeDevices.map((d) =>
+        deviceService.updateDevice(d.id, { activatedAt: now.getTime() }),
       ),
     );
   }

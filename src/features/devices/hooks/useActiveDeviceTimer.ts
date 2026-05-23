@@ -2,7 +2,6 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import { dailyUsageService } from "@/features/energy/services/dailyUsageService";
 import { useEffect, useRef } from "react";
 import { useDeviceStore } from "../store/deviceStore";
-import { useTimerStore } from "../store/timerStore";
 
 const FLUSH_INTERVAL_MS = 10_000;
 
@@ -12,6 +11,7 @@ export function useActiveDeviceTimer() {
   const intervalsRef = useRef<Record<string, ReturnType<typeof setInterval>>>(
     {},
   );
+  const lastFlushedAtRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -24,35 +24,43 @@ export function useActiveDeviceTimer() {
       if (!activeIds.has(id)) {
         clearInterval(intervalsRef.current[id]);
         delete intervalsRef.current[id];
+        delete lastFlushedAtRef.current[id];
       }
     });
 
     activeDevices.forEach((device) => {
       if (intervalsRef.current[device.id]) return;
 
-      // Buat interval — flush ke Firestore setiap 10 detik
-      intervalsRef.current[device.id] = setInterval(async () => {
-        const timer = useTimerStore.getState().timers[device.id];
-        if (!timer || !timer.activatedAt) return;
-
+      const flushDevice = async () => {
         const now = Date.now();
-        // Flush dari activatedAt timer sampai sekarang
-        const durationMs = now - timer.activatedAt;
+        const lastFlushed =
+          lastFlushedAtRef.current[device.id] ?? device.activatedAt!;
+        const durationMs = now - lastFlushed;
+
+        if (durationMs <= 0) return;
+
         const durationMinutes = durationMs / 1000 / 60;
         const kwh = (device.watt * (durationMinutes / 60)) / 1000;
 
-        await dailyUsageService.accumulateDeviceUsage(
-          user.uid!,
-          new Date(),
-          device.id,
-          { name: device.name, watt: device.watt, durationMinutes, kwh },
-        );
+        try {
+          await dailyUsageService.accumulateDeviceUsage(
+            user.uid!,
+            new Date(),
+            device.id,
+            { name: device.name, watt: device.watt, durationMinutes, kwh },
+          );
+          lastFlushedAtRef.current[device.id] = now;
+        } catch (error) {
+          console.error("Failed to flush device usage", device.id, error);
+        }
+      };
 
-        // Update activatedAt ke sekarang supaya interval berikutnya tidak double count
-        useTimerStore
-          .getState()
-          .startTimer(device.id, timer.totalMinutesBefore + durationMinutes);
-      }, FLUSH_INTERVAL_MS);
+      lastFlushedAtRef.current[device.id] = device.activatedAt!;
+      intervalsRef.current[device.id] = setInterval(
+        flushDevice,
+        FLUSH_INTERVAL_MS,
+      );
+      flushDevice();
     });
 
     return () => {
