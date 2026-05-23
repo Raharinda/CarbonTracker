@@ -1,9 +1,2 @@
-import { Text, View } from "react-native";
-
-export default function EnergyScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-lg font-bold">Energy Screen</Text>
-    </View>
-  );
-}
+import EnergyScreen from "@/features/energy/screens/EnergyScreen";
+export default EnergyScreen;

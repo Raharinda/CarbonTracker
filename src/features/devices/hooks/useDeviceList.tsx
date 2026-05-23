@@ -1,8 +1,11 @@
+import { useAuthStore } from "@/features/auth/store/authStore";
 import { useMemo, useState } from "react";
 import { deviceService } from "../services/deviceService";
 import { useDeviceStore } from "../store/deviceStore";
+import { useTimerStore } from "../store/timerStore";
 import type { Device } from "../types/device.types";
 import { useDevices } from "./useDevices";
+import { useDeviceToggle } from "./useDeviceToggle";
 
 export type DeviceListItem = {
   id: string;
@@ -24,7 +27,9 @@ function toUsageLabel(device: Device): string {
 export function useDeviceList() {
   const { devices } = useDevices();
   const setDevices = useDeviceStore((s) => s.setDevices);
-
+  const { startTimer, setToggling } = useTimerStore();
+  const { toggleDevice } = useDeviceToggle();
+  const user = useAuthStore((s) => s.user);
   const [filter, setFilter] = useState<DeviceFilter>("all");
 
   const allItems = useMemo<DeviceListItem[]>(
@@ -51,7 +56,6 @@ export function useDeviceList() {
     ? allItems.reduce((best, d) => (d.watt > best.watt ? d : best))
     : null;
 
-  // NOTE: ini masih pakai string compare — kalau mau akurat, simpan hoursPerDay di DeviceListItem
   const mostActive = allItems.length
     ? allItems.reduce((best, d) =>
         d.usageLabel.localeCompare(best.usageLabel) > 0 ? d : best,
@@ -62,17 +66,46 @@ export function useDeviceList() {
     const device = devices.find((item) => item.id === id);
     if (!device) return;
 
-    const nextActive = !device.active;
-
+    const now = new Date();
     try {
-      await deviceService.updateDevice(id, { active: nextActive });
-      setDevices(
-        devices.map((item) =>
-          item.id === id ? { ...item, active: nextActive } : item,
-        ),
-      );
+      if (!device.active) {
+        // Ambil totalMinutesBefore dari store — single source of truth
+        const currentTimer = useTimerStore.getState().timers[id];
+        const totalMinutesBefore = currentTimer?.totalMinutesBefore ?? 0;
+
+        await deviceService.updateDevice(id, {
+          active: true,
+          activatedAt: now.getTime(),
+        });
+
+        startTimer(id, totalMinutesBefore);
+
+        setDevices(
+          devices.map((item) =>
+            item.id === id
+              ? { ...item, active: true, activatedAt: now.getTime() }
+              : item,
+          ),
+        );
+      } else {
+        // Hitung total menit sekarang SEBELUM setToggling
+        const timer = useTimerStore.getState().timers[id];
+        const extraMinutes =
+          timer?.activatedAt && timer.activatedAt > 0
+            ? (now.getTime() - timer.activatedAt) / 1000 / 60
+            : 0;
+        const totalMinutesNow = (timer?.totalMinutesBefore ?? 0) + extraMinutes;
+
+        // Stop timer di store dulu — UI langsung pakai totalMinutesBefore
+        useTimerStore.getState().stopTimer(id, totalMinutesNow);
+
+        setToggling(id, true);
+        await toggleDevice(device); // flush ke Firestore
+        setToggling(id, false);
+      }
     } catch (error) {
       console.error("Failed to update device state:", error);
+      setToggling(id, false);
     }
   }
 

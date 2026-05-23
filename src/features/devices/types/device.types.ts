@@ -27,6 +27,7 @@ export interface Device {
   hoursPerDay: number;
   daysPerMonth: number;
   active: boolean;
+  activatedAt?: number | null;
   monthlyKwh?: number;
   monthlyCost?: number;
   monthlyEmissions?: number;

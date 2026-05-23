@@ -10,9 +10,11 @@ import {
   DeviceStatsRow,
 } from "../components/DeviceList";
 
+import { useActiveDeviceTimer } from "../hooks/useActiveDeviceTimer";
 import { useDeviceList } from "../hooks/useDeviceList";
 
 export default function DevicesScreen() {
+  useActiveDeviceTimer();
   const router = useRouter();
 
   const {
