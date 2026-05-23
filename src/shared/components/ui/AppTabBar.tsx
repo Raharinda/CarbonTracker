@@ -1,4 +1,5 @@
 // src/shared/components/ui/AppTabBar.tsx
+import { useAddDeviceSheetStore } from "@/features/devices/store/addDeviceSheetStore";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Home, LayoutDashboard, User, Zap } from "lucide-react-native";
 import { Pressable, View } from "react-native";
@@ -13,6 +14,9 @@ const TABS = [
 
 export function AppTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const isAddDeviceSheetOpen = useAddDeviceSheetStore((state) => state.isOpen);
+
+  if (isAddDeviceSheetOpen) return null;
 
   return (
     <View

@@ -1,23 +1,25 @@
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AddDeviceSheet } from "../components/AddDeviceSheet";
 import {
-    DeviceCard,
-    DeviceEmptyState,
-    DeviceFilterBar,
-    DeviceScreenHeader,
-    DeviceStatsRow,
+  DeviceCard,
+  DeviceEmptyState,
+  DeviceFilterBar,
+  DeviceScreenHeader,
+  DeviceStatsRow,
 } from "../components/DeviceList";
 
 import { useActiveDeviceTimer } from "../hooks/useActiveDeviceTimer";
 import { useDeviceList } from "../hooks/useDeviceList";
+import { useAddDeviceSheetStore } from "../store/addDeviceSheetStore";
 
 export default function DevicesScreen() {
   useActiveDeviceTimer();
   const [now, setNow] = useState(Date.now());
-  const router = useRouter();
+  const { isOpen: isAddSheetVisible, setOpen: setIsAddSheetVisible } =
+    useAddDeviceSheetStore();
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -55,9 +57,11 @@ export default function DevicesScreen() {
         <DeviceFilterBar
           selected={filter}
           onSelect={setFilter}
-          onAddPress={() =>
-            router.push({ pathname: "/(app)/devices/add" } as any)
-          }
+          onAddPress={() => setIsAddSheetVisible(true)}
+        />
+        <AddDeviceSheet
+          visible={isAddSheetVisible}
+          onClose={() => setIsAddSheetVisible(false)}
         />
 
         <View className="mt-4 gap-3">
