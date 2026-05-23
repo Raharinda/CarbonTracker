@@ -39,7 +39,7 @@ export default function DevicesScreen() {
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#F3FBF7]">
       <ScrollView
         className="flex-1"
-        contentContainerClassName="px-4 pb-8"
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 140 }}
         showsVerticalScrollIndicator={false}
       >
         <DeviceScreenHeader

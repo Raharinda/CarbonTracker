@@ -48,7 +48,7 @@ export default function EnergyScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ gap: 16, paddingBottom: 140 }}
       >
         <EnergyHeader
           totalKwh={todayKwh}

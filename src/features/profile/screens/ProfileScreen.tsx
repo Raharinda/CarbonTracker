@@ -34,7 +34,7 @@ export default function ProfileScreen() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: 20, paddingBottom: 32 }}
+        contentContainerStyle={{ gap: 20, paddingBottom: 140 }}
       >
         <ProfileHeader
           name={profile.displayName}

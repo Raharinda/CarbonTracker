@@ -14,6 +14,9 @@ export function ActiveDevicesList({ today }: Props) {
   const togglingIds = useTogglingStore((s) => s.togglingIds);
   const [now, setNow] = useState(Date.now());
   const frozenMinutesRef = useRef<Record<string, number>>({});
+  const activeSessionBaseMinutesRef = useRef<Record<string, number>>({});
+  const activeSessionBaseKwhRef = useRef<Record<string, number>>({});
+  const activeSessionActivatedAtRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -26,6 +29,20 @@ export function ActiveDevicesList({ today }: Props) {
   const liveOnlyDevices = devices.filter(
     (d) => d.active && d.activatedAt && !firestoreIds.has(d.id),
   );
+
+  useEffect(() => {
+    const activeIds = new Set(
+      devices.filter((d) => d.active && d.activatedAt).map((d) => d.id),
+    );
+
+    Object.keys(activeSessionActivatedAtRef.current).forEach((id) => {
+      if (!activeIds.has(id)) {
+        delete activeSessionActivatedAtRef.current[id];
+        delete activeSessionBaseMinutesRef.current[id];
+        delete activeSessionBaseKwhRef.current[id];
+      }
+    });
+  }, [devices]);
 
   const allEntries: [string, DeviceDailyRecord | null][] = [
     ...firestoreEntries,
@@ -81,12 +98,32 @@ export function ActiveDevicesList({ today }: Props) {
 
           const watt = record?.watt ?? liveDevice?.watt ?? 0;
           const name = record?.name ?? liveDevice?.name ?? deviceId;
+          const activationAt = liveDevice?.activatedAt ?? now;
 
-          const flushedMinutes = record?.durationMinutes ?? 0;
-          const extraMinutes = liveDevice?.activatedAt
-            ? (now - liveDevice.activatedAt) / 1000 / 60
+          if (liveDevice) {
+            const previousActivation =
+              activeSessionActivatedAtRef.current[deviceId];
+
+            if (previousActivation !== activationAt) {
+              activeSessionActivatedAtRef.current[deviceId] = activationAt;
+              activeSessionBaseMinutesRef.current[deviceId] =
+                record?.durationMinutes ?? 0;
+              activeSessionBaseKwhRef.current[deviceId] = record?.kwh ?? 0;
+            }
+          }
+
+          const baseMinutes = liveDevice
+            ? (activeSessionBaseMinutesRef.current[deviceId] ??
+              record?.durationMinutes ??
+              0)
+            : (record?.durationMinutes ?? 0);
+          const baseKwh = liveDevice
+            ? (activeSessionBaseKwhRef.current[deviceId] ?? record?.kwh ?? 0)
+            : (record?.kwh ?? 0);
+          const elapsedMinutes = liveDevice
+            ? Math.max((now - activationAt) / 1000 / 60, 0)
             : 0;
-          const currentMinutes = flushedMinutes + extraMinutes;
+          const currentMinutes = baseMinutes + elapsedMinutes;
 
           // Freeze nilai saat toggle OFF dimulai
           if (isToggling && frozenMinutesRef.current[deviceId] === undefined) {
@@ -101,10 +138,13 @@ export function ActiveDevicesList({ today }: Props) {
             ? (frozenMinutesRef.current[deviceId] ?? currentMinutes)
             : currentMinutes;
 
-          const totalKwh =
-            record?.kwh != null
-              ? record.kwh +
-                (liveDevice ? (watt * (extraMinutes / 60)) / 1000 : 0)
+          const unflushedKwh = liveDevice
+            ? (watt * (elapsedMinutes / 60)) / 1000
+            : 0;
+          const totalKwh = liveDevice
+            ? baseKwh + unflushedKwh
+            : record?.kwh != null
+              ? record.kwh
               : (watt * (totalMinutes / 60)) / 1000;
 
           const hours = Math.floor(totalMinutes / 60);

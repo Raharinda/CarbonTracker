@@ -17,8 +17,10 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
   return (
     <View
       style={{
-        marginHorizontal: 24,
-        marginBottom: insets.bottom + 16,
+        position: "absolute",
+        left: 24,
+        right: 24,
+        bottom: insets.bottom + 16,
         backgroundColor: "#F0F0F0",
         borderRadius: 32,
         paddingVertical: 10,
@@ -26,6 +28,7 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        zIndex: 10,
         // Neumorphic shadow
         shadowColor: "#A8B4A0",
         shadowOffset: { width: -4, height: -4 },
